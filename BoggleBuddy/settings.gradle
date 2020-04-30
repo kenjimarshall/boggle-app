@@ -1,0 +1,2 @@
+rootProject.name='Boggle Buddy'
+include ':app', ':ocv'

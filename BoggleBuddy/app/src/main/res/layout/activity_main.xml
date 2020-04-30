@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="176dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="176dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Boggle Buddy"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/wGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/eGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".95" />
+
+    <TableLayout
+        android:id="@+id/tileGrid"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toStartOf="@+id/eGuide"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/wGuide"
+        app:layout_constraintTop_toBottomOf="@id/title"
+
+        >
+
+        <TableRow
+            android:id="@+id/row_0"
+            style="@style/RowOfTiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+<!--            <com.google.android.material.textfield.TextInputEditText-->
+<!--                android:id="@+id/tile_0_0"-->
+<!--                style="@style/BoggleTile" />-->
+
+            <EditText
+                android:id="@+id/tile_0_0"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_0_1"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_0_2"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_0_3"
+                style="@style/BoggleTile" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/row_1"
+            style="@style/RowOfTiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/tile_1_0"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_1_1"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_1_2"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_1_3"
+                style="@style/BoggleTile" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/row_2"
+            style="@style/RowOfTiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/tile_2_0"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_2_1"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_2_2"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_2_3"
+                style="@style/BoggleTile" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/row_3"
+            style="@style/RowOfTiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/tile_3_0"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_3_1"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_3_2"
+                style="@style/BoggleTile" />
+
+            <EditText
+                android:id="@+id/tile_3_3"
+                style="@style/BoggleTile" />
+        </TableRow>
+    </TableLayout>
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/sGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.95" />
+
+
+    <ImageButton
+        android:id="@+id/camera"
+        style="@style/Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/tileGrid"
+        app:layout_constraintTop_toBottomOf="@id/tileGrid"
+        app:srcCompat="@android:drawable/ic_menu_camera" />
+
+    <Button
+        android:id="@+id/solveButton"
+        style="@style/Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Solve"
+
+        app:layout_constraintEnd_toEndOf="@id/tileGrid"
+        app:layout_constraintTop_toBottomOf="@id/tileGrid" />
+
+    <Button
+        android:id="@+id/randomButton"
+        style="@style/Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Random Board"
+        app:layout_constraintEnd_toStartOf="@id/solveButton"
+        app:layout_constraintTop_toBottomOf="@id/tileGrid" />
+
+    <TextView
+        android:id="@+id/solutionsTextView"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/camera"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@id/wGuide"
+        app:layout_constraintEnd_toStartOf="@id/eGuide"
+        android:text="Solution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </TextView>
+
+    <ListView
+        android:id="@+id/solutionsListView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toTopOf="@id/sGuide"
+        app:layout_constraintEnd_toStartOf="@id/eGuide"
+        app:layout_constraintStart_toStartOf="@id/wGuide"
+        app:layout_constraintTop_toBottomOf="@id/solutionsTextView" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

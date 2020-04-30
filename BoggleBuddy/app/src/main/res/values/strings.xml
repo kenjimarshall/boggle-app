@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Boggle Buddy</string>
+    
+    <string-array name="word_sizes">
+        <item>3 Letters</item>
+        <item>4 Letters</item>
+        <item>5 Letters</item>
+        <item>6 Letters</item>
+        <item>7 Letters</item>
+        <item>8 Letters</item>
+        <item>9 Letters</item>
+        <item>10 Letters</item>
+    </string-array>
+    
+    <string-array name="solutions">
+        <item>cat</item>
+        <item>bone</item>
+        <item>stake</item>
+        <item>blasts</item>
+        <item>frolick</item>
+        <item>sham-wow</item>
+        <item>potpourri</item>
+        <item>straighten</item>
+    </string-array>
+    
+</resources>

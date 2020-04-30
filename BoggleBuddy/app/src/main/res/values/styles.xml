@@ -1,0 +1,43 @@
+
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+    <!-- Boggle Tile Styling. -->
+    <style name="BoggleTile">
+        <item name = "android:layout_marginStart">10dp</item>
+        <item name = "android:layout_marginEnd">10dp</item>
+        <item name = "android:layout_height">40dp</item>
+        <item name = "android:layout_width">0dp</item>
+        <item name = "android:layout_weight">1</item>
+        <item name = "android:hint">A</item>
+        <item name = "android:textAlignment">center</item>
+        <item name = "android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#0f0f0f</item>
+<!--        <item name = "singleLine"> true </item>-->
+        <item name = "android:maxLength">2</item>
+        <item name = "android:inputType">text</item>
+        <item name = "backgroundTint">@color/colorPrimary</item>
+    </style>
+
+    <style name="RowOfTiles">
+        <item name = "android:layout_marginBottom">10dp</item>
+    </style>
+
+    <style name="Button">
+        <item name = "android:layout_marginTop">10dp</item>
+        <item name = "android:layout_marginStart">10dp</item>
+        <item name = "android:layout_marginEnd">10dp</item>
+        <item name = "android:textSize">14sp</item>
+        <item name = "android:backgroundTint">@color/colorPrimary</item>
+    </style>
+
+</resources>
