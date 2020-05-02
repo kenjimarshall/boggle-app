@@ -1,7 +1,6 @@
 package com.kenjimarshall.bogglebuddy;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -31,7 +30,8 @@ public class Boggle {
         this.threeDict = dicts.get(1);
     }
 
-    private ArrayList<HashSet<String>> loadWordDict() {
+
+    private ArrayList<HashSet<String>> loadWordDict() { // to optimize could build a Trie instead
         HashSet<String> wordDict = new HashSet<>();
         HashSet<String> threeDict = new HashSet<>();
         try {
@@ -69,7 +69,7 @@ public class Boggle {
             Node newNode = new Node(xPosition, yPosition, edges, symbols.get(i).toLowerCase());
             adjList.add(newNode);
             for (Node node : adjList) {
-                if (Math.abs(xPosition - node.xPosition) <= 1 && Math.abs(yPosition - node.yPosition) <= 1) {
+                if (Math.abs(xPosition - node.xPosition) <= 1 && Math.abs(yPosition - node.yPosition) <= 1) { // then it is a neighbor
                     newNode.edges.add(node);
                     node.edges.add(newNode);
                 }
@@ -84,14 +84,14 @@ public class Boggle {
     }
 
     public HashMap<Integer, String[]> findWords() {
-        HashMap<Integer, HashSet<String>> validWords = new HashMap<>();
+        HashMap<Integer, HashSet<String>> validWords = new HashMap<>(); // maps length of word to array of words
         for (int i = 3; i <= 10; i++) {
-            validWords.put(Integer.valueOf(i), new HashSet<String>());
+            validWords.put(Integer.valueOf(i), new HashSet<String>()); // words of length 3 to 10
         }
 
         for (Node node: this.adjList) {
             ArrayList<Node> starterList = new ArrayList<>();
-            starterList.add(node);
+            starterList.add(node); // tracks node already visited
             this.extendAndCheckWords(node.symbol, starterList, validWords);
         }
 
@@ -106,23 +106,24 @@ public class Boggle {
         return sortedValidWords;
     }
 
+    // Performs DFS on the graph while also validating words
     private void extendAndCheckWords(String wordToExtend, ArrayList<Node> nodeList, HashMap<Integer, HashSet<String>> validWords) {
         boolean good_starter = true;
-        if (wordToExtend.length() == 3) {
+        if (wordToExtend.length() == 3) { // checks if three-letter prefix is valid
             good_starter = this.threeDict.contains(wordToExtend);
         }
 
         if (good_starter) {
-            if (wordToExtend.length() >= 3) {
+            if (wordToExtend.length() >= 3) { // only words of three letters or more count in Boggle
                 if (this.validateWord(wordToExtend)){
                     validWords.get(Integer.valueOf(wordToExtend.length())).add(wordToExtend);
                 }
             }
 
             if (wordToExtend.length() < 10) {
-                for (Node neighbor: nodeList.get(nodeList.size()-1).edges) {
-                    if (!nodeList.contains(neighbor)) {
-                        ArrayList<Node> newNodeList = new ArrayList<>(nodeList);
+                for (Node neighbor: nodeList.get(nodeList.size()-1).edges) { // all neighbors of the most recently visited node
+                    if (!nodeList.contains(neighbor)) { // hasn't been visited yet
+                        ArrayList<Node> newNodeList = new ArrayList<>(nodeList); // to avoid pointer issues
                         newNodeList.add(neighbor);
                         this.extendAndCheckWords(wordToExtend.concat(neighbor.symbol), newNodeList, validWords);
                     }
@@ -138,7 +139,6 @@ public class Boggle {
         private int yPosition;
         private ArrayList<Node> edges;
         private String symbol;
-
 
         private Node(int xPosition, int yPosition, ArrayList<Node> edges, String symbol) {
             this.xPosition = xPosition;

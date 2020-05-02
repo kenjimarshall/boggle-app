@@ -1,5 +1,7 @@
 package com.kenjimarshall.bogglebuddy;
 
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -112,6 +114,7 @@ public class IntervalNode<T> implements Comparable<IntervalNode> {
             curr = stack.pop();
             if (curr.data != null) { // hasn't been removed
                 if (curr.data.equals(datum)) { // found it
+                    Log.d("Open CV", "Found node to remove. Nullifying...");
                     curr.data = null;
                     break;
                 }

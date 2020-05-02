@@ -10,7 +10,6 @@ import androidx.core.view.ViewCompat;
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.theartofdev.edmodo.cropper.CropImage;
 
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -58,14 +57,11 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.BaseCascadeClassifier;
-import org.opencv.objdetect.CascadeClassifier;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -75,22 +71,22 @@ public class MainActivity extends AppCompatActivity {
     final HashSet<String> VALID_CHARS = new HashSet<>(Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
             "o", "p", "qu", "r", "u", "s", "t", "v", "w", "x", "y", "z"));
 
-    final String[] VALID_CHARS_UPPER = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+    final String[] VALID_CHARS_PRETTY = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
             "M", "N", "O", "P", "Qu", "U", "R", "S", "T", "W", "X", "Y", "Z"};
 
     private Button randomBtn, solveBtn;
     private ImageButton cameraBtn;
 
-    private Uri mPhotoUri;
-    private Uri mCroppedUri;
+    private Uri mPhotoUri, mCroppedUri;
 
     private String ASSET_TESS_DIR = "tessdata";
     private String TESS_DATA = "/tessdata";
     private String DATA_PATH;
+
+
     private TessBaseAPI tessAPI;
 
-    private ImageView testImage;
-
+    private ImageView testImage; // REMOVE FOR PRODUCTION
 
     private boolean OpenCVSetup = false;
 
@@ -99,44 +95,41 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        testImage = findViewById(R.id.testImage);
+        checkPermission(); // READ/WRITE to external storage
 
-        DATA_PATH = this.getExternalFilesDir(null) + "/Tess";
+        testImage = findViewById(R.id.testImage); // REMOVE FOR PRODUCTION
 
+        DATA_PATH = this.getExternalFilesDir(null) + "/Tess"; // need to store tesseract model file here
 
         randomBtn = (Button) findViewById(R.id.randomButton);
         solveBtn = (Button) findViewById(R.id.solveButton);
         cameraBtn = (ImageButton) findViewById(R.id.camera);
 
-        checkPermission();
 
-
+        // Randomize board
         randomBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // Get all the tiles
                 EditText[] tiles = getTiles();
                 Random r = new Random();
 
                 // Make random assignments for each tile
                 for (EditText tile : tiles) {
-                    int random_index = r.nextInt(VALID_CHARS_UPPER.length);
-                    tile.setText(VALID_CHARS_UPPER[random_index]);
+                    int random_index = r.nextInt(VALID_CHARS_PRETTY.length);
+                    tile.setText(VALID_CHARS_PRETTY[random_index]);
                 }
             }
         });
 
+        // Solve board
         solveBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
                 EditText[] tiles = getTiles();
-                if (!validateTiles(tiles)) {
-                    Toast.makeText(MainActivity.this, "Invalid board! Use individual characters or 'Qu' for Q", Toast.LENGTH_LONG).show();
-                }
-                else {
+                if (validateTiles(tiles)) {
                     ArrayList<String> symbols = new ArrayList<>();
                     for (EditText tile : tiles) {
                         symbols.add(tile.getText().toString());
@@ -417,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Boggle letters should take between 1/5 to 1/12 along any dimension of the board
 
-            if (contourRect.area() < (imgHeight * imgWidth) * 1/450) {
+            if (contourRect.area() < (imgHeight * imgWidth) * 1/450) { // small enough to capture I contours
                 continue;
             }
 
@@ -425,7 +418,11 @@ public class MainActivity extends AppCompatActivity {
                 continue;
             }
 
-            else if (contourWidth < imgWidth * 1 / 100 || contourHeight < imgHeight * 1/100) {
+            else if (contourWidth < imgWidth * 1 / 50 || contourHeight < imgHeight * 1/ 50) {
+                continue;
+            }
+
+            else if (contourWidth < imgWidth * 1 / 15 && contourHeight < imgHeight * 1/15) {
                 continue;
             }
 
@@ -660,7 +657,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Mat borderedLetterContour = new Mat();
-                Core.copyMakeBorder(letterContour, borderedLetterContour, 100, 100, 100, 100, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
+                Core.copyMakeBorder(letterContour, borderedLetterContour, 200, 200, 200, 200, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
                 Mat borderedLetterContourFlipped = borderedLetterContour.clone();
                 Mat borderedLetterContourRotCW = borderedLetterContour.clone();
                 Mat borderedLetterContourRotCCW = borderedLetterContour.clone();
@@ -758,7 +755,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                if (finalPredConfidence < finalPredRotConfidence) {
+                if (finalPred.equals("I")) { // I is detected geometrically instead. Confusion between R and I should be mitigated.
+                    Log.d("Tesseract", "Predicted I is invalid. Using rotated prediction.");
+                    finalPred = finalPredRot;
+                }
+                else if (!finalPredRot.equals("I") && finalPredConfidence < finalPredRotConfidence) {
                     finalPred = finalPredRot;
                 }
 

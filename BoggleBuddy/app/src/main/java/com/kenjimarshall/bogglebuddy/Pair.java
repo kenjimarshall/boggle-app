@@ -20,9 +20,11 @@ public class Pair implements Comparable<Pair> {
     }
 
     public boolean equals(Pair obj) {
-
         return this.contour.equals(obj.contour);
     }
 
-
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return equals((Pair) obj);
+    }
 }
