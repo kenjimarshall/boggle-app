@@ -1,5 +1,7 @@
 package com.kenjimarshall.bogglebuddy;
 
+import androidx.annotation.Nullable;
+
 import org.opencv.core.Mat;
 
 public class Pair implements Comparable<Pair> {
@@ -16,4 +18,11 @@ public class Pair implements Comparable<Pair> {
     public int compareTo(Pair o) {
         return Double.compare(this.pos, o.pos);
     }
+
+    public boolean equals(Pair obj) {
+
+        return this.contour.equals(obj.contour);
+    }
+
+
 }

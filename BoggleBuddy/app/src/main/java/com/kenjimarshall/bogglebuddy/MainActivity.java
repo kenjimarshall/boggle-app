@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -57,11 +58,14 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.BaseCascadeClassifier;
+import org.opencv.objdetect.CascadeClassifier;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -85,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
     private String DATA_PATH;
     private TessBaseAPI tessAPI;
 
+    private ImageView testImage;
+
 
     private boolean OpenCVSetup = false;
 
@@ -92,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        testImage = findViewById(R.id.testImage);
 
         DATA_PATH = this.getExternalFilesDir(null) + "/Tess";
 
@@ -371,16 +379,12 @@ public class MainActivity extends AppCompatActivity {
 
     private Mat preprocessImage(Mat img) {
         Imgproc.cvtColor(img, img, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.GaussianBlur(img, img, new Size(5, 5), 0);
-        Imgproc.adaptiveThreshold(img, img, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
-                Imgproc.THRESH_BINARY_INV, 51, 3);
-        Mat kernelOne = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
-        Mat kernelTwo = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3, 3));
+        Imgproc.threshold(img, img, 150, 255, Imgproc.THRESH_BINARY_INV);
+        Mat kernelOne = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3, 3));
+        Mat kernelTwo = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(5, 5));
 
-        Imgproc.morphologyEx(img, img, Imgproc.MORPH_OPEN, kernelOne, new Point(-1, -1), 1);
-        Imgproc.dilate(img, img, kernelOne, new Point(-1, -1), 2);
-        Imgproc.morphologyEx(img, img, Imgproc.MORPH_CLOSE, kernelTwo, new Point(-1, -1), 2);
-        Imgproc.erode(img, img, kernelOne, new Point(-1, -1), 1);
+
+        Imgproc.morphologyEx(img, img, Imgproc.MORPH_CLOSE, kernelOne, new Point(-1, -1), 2);
 
         return img;
     }
@@ -393,9 +397,11 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         // Find all contours on board
-
         Imgproc.findContours(img, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
         Log.d("Open CV", String.valueOf(contours.size()) + " contours found.");
+
+
+
 
         ArrayList<Mat> letterContours = new ArrayList<>();
         IntervalNode rootY = null;
@@ -408,29 +414,43 @@ public class MainActivity extends AppCompatActivity {
             double contourY = contourRect.y;
 
 
+
             // Boggle letters should take between 1/5 to 1/12 along any dimension of the board
-            if (contourWidth < imgWidth / 14 || contourHeight < imgHeight / 14) {
-//                Log.d("Open CV", "Contour of size " + String.valueOf(contourHeight) + " x " + String.valueOf(contourWidth) + " ignored.");
-                continue;
-            }
-            else if (contourWidth > imgWidth / 5 || contourHeight > imgHeight / 5) {
-//                Log.d("Open CV", "Contour of size " + String.valueOf(contourHeight) + " x " + String.valueOf(contourWidth) + " ignored.");
+
+            if (contourRect.area() < (imgHeight * imgWidth) * 1/450) {
                 continue;
             }
 
-            Log.d("Open CV", "Contour of size " + String.valueOf(contourHeight) + " x " + String.valueOf(contourWidth) + " ACCEPTED.");
-            Log.d("Open CV", "Relative size of " + String.valueOf(contourWidth / imgWidth) + " and " + String.valueOf(contourHeight / imgHeight));
+            else if (contourRect.area() > (imgHeight * imgWidth * 1/60)){
+                continue;
+            }
 
+            else if (contourWidth < imgWidth * 1 / 100 || contourHeight < imgHeight * 1/100) {
+                continue;
+            }
+
+            else if (contourX <= 5 || contourY <= 5 || contourX + contourWidth >= (imgWidth - 6) || contourY + contourHeight >= (imgHeight - 6)) {
+                continue;
+            }
 
             Mat letterContour = new Mat(img, contourRect).clone(); // contourRect is ROI of original MAT
             letterContours.add(letterContour); // Identified as a contour of appropriate size
 
+            Log.d("Open CV", "Contour of size " + String.valueOf(contourHeight) + " x " + String.valueOf(contourWidth) + " ACCEPTED.");
+            Log.d("Open CV", "Relative size by area of " + String.valueOf(contourRect.area() / (imgHeight * imgWidth)));
+
+
+            Imgproc.rectangle(img, new Point(contourRect.x,contourRect.y), new Point(contourRect.x+contourRect.width,contourRect.y+contourRect.height), new Scalar(200), 15);
+
+
+
+
             IntervalNode<Pair> yInterval = new IntervalNode<>(contourY,
                     contourY + contourHeight, new Pair(contourX, letterContour));
-            // BST organized by y-coordinate. Stores x-coordinate for grid formulation later.
+            // BST of intervals organized by y-coordinate. Stores x-coordinate for grid formulation later.
             IntervalNode<Pair> xInterval = new IntervalNode<>(contourX,
                     contourX + contourWidth, new Pair(contourY, letterContour));
-            // BST organized by x-coordinate
+            // BST of intervals organized by x-coordinate
 
             if (rootY == null) {
                 rootY = yInterval; // Initialize tree
@@ -447,6 +467,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        Bitmap contourBitmap = Bitmap.createBitmap(img.cols(), img.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(img, contourBitmap);
+        testImage.setImageBitmap(contourBitmap);
+
         Log.d("Open CV", String.valueOf(letterContours.size()) + " letter-sized contours found.");
 
         if (letterContours.size() == 0) { // No letters found.
@@ -456,9 +480,58 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<IntervalNode<ArrayList<Pair>>> mergedY = rootY.merge();
         // Collapse to all exclusive intervals contained in tree.
         ArrayList<IntervalNode<ArrayList<Pair>>> mergedX = rootX.merge();
+
+        boolean outliersExist = true;
+        Log.d("Open CV", "Grid before pruning: " + String.valueOf(mergedY.size()) + ", " + String.valueOf(mergedX.size()));
+        while (outliersExist) {
+
+            boolean reconstructed = false;
+
+            if (mergedY.size() == 0) {
+                Log.d("Open CV", "No rows left.");
+                throw new BoardRecognitionError("Failed to find board!");
+            }
+            for (int i = 0; i < mergedY.size(); i++) {
+                IntervalNode<ArrayList<Pair>> y_interval = mergedY.get(i);
+                Log.d("Open CV", String.valueOf(y_interval.data.size()) + " elements in row.");
+                if (y_interval.data.size() == 1) {
+                    Log.d("Open CV", "Outlier row removed. Reconstructing grid estimation...");
+                    rootY.removeByData(y_interval.data.get(0));
+                    rootX.removeByData(y_interval.data.get(0));
+                    mergedY = rootY.merge();
+                    mergedX = rootX.merge();
+                    Log.d("Open CV", "Grid after reconstruction: " + String.valueOf(mergedY.size()) + ", " + String.valueOf(mergedX.size()));
+                    reconstructed = true;
+                    break;
+                }
+            }
+
+
+            if (mergedX.size() == 0) {
+                Log.d("Open CV", "No columns left.");
+                throw new BoardRecognitionError("Failed to find board!");
+            }
+
+            for (int i = 0; i < mergedX.size(); i++) {
+                IntervalNode<ArrayList<Pair>> x_interval = mergedX.get(i);
+                Log.d("Open CV", String.valueOf(x_interval.data.size()) + " elements in column.");
+                if (x_interval.data.size() == 1) { // outlier merged group with one element
+                    Log.d("Open CV", "Outlier column removed. Reconstructing grid estimation...");
+                    rootY.removeByData(x_interval.data.get(0));
+                    rootX.removeByData(x_interval.data.get(0));
+                    mergedY = rootY.merge();
+                    mergedX = rootX.merge();
+                    Log.d("Open CV", "Grid after reconstruction: " + String.valueOf(mergedY.size()) + ", " + String.valueOf(mergedX.size()));
+                    reconstructed = true;
+                    break;
+                }
+            }
+            outliersExist = reconstructed;
+        }
+
         ArrayList<Mat> orderedLetterContours = new ArrayList<>();
 
-        Log.d("Open CV", "Grid of size: " + String.valueOf(mergedY.size()) + ", " + String.valueOf(mergedX.size()));
+        Log.d("Open CV", "Pruned grid of size: " + String.valueOf(mergedY.size()) + ", " + String.valueOf(mergedX.size()));
 
         if (mergedY.size() != 4 || mergedX.size() != 4) { // Expectation of four rows and four columns
             throw new BoardRecognitionError("Failed to localize Boggle board.");
@@ -565,10 +638,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
     private ArrayList<String> getBoardCharacters(ArrayList<Mat> letterContours) {
         ArrayList<String> symbols = new ArrayList<>();
 
@@ -582,26 +651,23 @@ public class MainActivity extends AppCompatActivity {
             tessAPI.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "ABCDEFGHIJKLMNOPQWRSTUVWXYZ");
 
             Log.d("Tesseract", "Tesseract API loaded.");
-            int testCount = -1;
             for (Mat letterContour : letterContours) {
 
-                testCount++;
-
-                double width = letterContour.width();
-                double height = letterContour.height();
-
-                if (width > height) {
-                    Log.d("Open CV", "Sideways letter detected. Flipping.");
-                    rotateMAT(letterContour, 1); // 90 CW
-                    Log.d("Open CV", "New dimensions: " + String.valueOf(letterContour.width()) +
-                            ", " + String.valueOf(letterContour.height()) );
+                if (letterContour.width() < letterContour.height() * 1/3) {
+                    Log.d("Tesseract", "Identified I geometrically!");
+                    symbols.add("I");
+                    continue;
                 }
 
                 Mat borderedLetterContour = new Mat();
-                Core.copyMakeBorder(letterContour, borderedLetterContour, 500, 500, 500, 500, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
+                Core.copyMakeBorder(letterContour, borderedLetterContour, 100, 100, 100, 100, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
                 Mat borderedLetterContourFlipped = borderedLetterContour.clone();
-                rotateMAT(borderedLetterContourFlipped, 3); // 180 deg
+                Mat borderedLetterContourRotCW = borderedLetterContour.clone();
+                Mat borderedLetterContourRotCCW = borderedLetterContour.clone();
 
+                rotateMAT(borderedLetterContourFlipped, 3); // 180 deg
+                rotateMAT(borderedLetterContourRotCW, 1); // 90 CW
+                rotateMAT(borderedLetterContourRotCCW, 2); // 90 CCW
 
 
                 Bitmap letterBmp = Bitmap.createBitmap(borderedLetterContour.cols(), borderedLetterContour.rows(),
@@ -610,9 +676,16 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap letterBmpFlipped = Bitmap.createBitmap(borderedLetterContourFlipped.cols(),
                         borderedLetterContourFlipped.rows(), Bitmap.Config.ARGB_8888);
 
+                Bitmap letterBmpCW = Bitmap.createBitmap(borderedLetterContourRotCW.cols(),
+                        borderedLetterContourRotCW.rows(), Bitmap.Config.ARGB_8888);
+
+                Bitmap letterBmpCCW = Bitmap.createBitmap(borderedLetterContourRotCCW.cols(),
+                        borderedLetterContourRotCCW.rows(), Bitmap.Config.ARGB_8888);
+
                 Utils.matToBitmap(borderedLetterContour, letterBmp);
                 Utils.matToBitmap(borderedLetterContourFlipped, letterBmpFlipped);
-
+                Utils.matToBitmap(borderedLetterContourRotCW, letterBmpCW);
+                Utils.matToBitmap(borderedLetterContourRotCCW, letterBmpCCW);
 
 
                 tessAPI.setImage(letterBmp);
@@ -623,28 +696,76 @@ public class MainActivity extends AppCompatActivity {
                 String predictedCharFlipped = tessAPI.getUTF8Text();
                 int confidenceFlipped = tessAPI.meanConfidence();
 
+                tessAPI.setImage(letterBmpCW);
+                String predictedCharCW = tessAPI.getUTF8Text();
+                int confidenceCW = tessAPI.meanConfidence();
+
+                tessAPI.setImage(letterBmpCCW);
+                String predictedCharCCW = tessAPI.getUTF8Text();
+                int confidenceCCW = tessAPI.meanConfidence();
+
                 String finalPred;
+                int finalPredConfidence;
 
                 if (predictedChar.equals(" ") && predictedCharFlipped.equals(" ")) {
                     finalPred = ""; // Empty prediction
+                    finalPredConfidence = 0;
                 }
                 else if (predictedChar.equals(" ")) {
                     finalPred = predictedCharFlipped;
+                    finalPredConfidence = confidenceFlipped;
                 }
                 else if (predictedCharFlipped.equals(" ")) {
                     finalPred = predictedChar;
+                    finalPredConfidence = confidence;
                 }
                 else {
                     if (confidence >= confidenceFlipped) {
                         finalPred = predictedChar;
+                        finalPredConfidence = confidence;
                     }
                     else {
                         finalPred = predictedCharFlipped;
+                        finalPredConfidence = confidenceFlipped;
                     }
+                }
+
+                String finalPredRot;
+                int finalPredRotConfidence;
+
+                if (predictedCharCW.equals(" ") && predictedCharCCW.equals(" ")) {
+                    finalPredRot = ""; // Empty prediction
+                    finalPredRotConfidence = 0;
+                }
+                else if (predictedCharCW.equals(" ")) {
+                    finalPredRot = predictedCharCCW;
+                    finalPredRotConfidence = confidenceCCW;
+
+                }
+                else if (predictedCharCCW.equals(" ")) {
+                    finalPredRot = predictedCharCW;
+                    finalPredRotConfidence = confidenceCW;
+                }
+                else {
+                    if (confidenceCW >= confidenceCCW) {
+                        finalPredRot = predictedCharCW;
+                        finalPredRotConfidence = confidenceCW;
+
+                    }
+                    else {
+                        finalPredRot = predictedCharCCW;
+                        finalPredRotConfidence = confidenceCCW;
+                    }
+                }
+
+                if (finalPredConfidence < finalPredRotConfidence) {
+                    finalPred = finalPredRot;
                 }
 
                 Log.d("Tesseract", "Prediction: " + predictedChar + " with confidence " + String.valueOf(confidence));
                 Log.d("Tesseract", "Flipped Prediction: " + predictedCharFlipped + " with confidence " + String.valueOf(confidenceFlipped));
+                Log.d("Tesseract", "Prediction (CW): " + predictedCharCW + " with confidence " + String.valueOf(confidenceCW));
+                Log.d("Tesseract", "Prediction (CCW): " + predictedCharCCW + " with confidence " + String.valueOf(confidenceCCW));
                 Log.d("Tesseract", "Final Prediction: " + finalPred);
                 symbols.add(finalPred);
             }

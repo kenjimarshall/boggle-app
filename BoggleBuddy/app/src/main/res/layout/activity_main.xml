@@ -208,5 +208,12 @@
         app:layout_constraintStart_toStartOf="@id/wGuide"
         app:layout_constraintTop_toBottomOf="@id/solutionsTextView" />
 
+    <ImageView
+        android:id="@+id/testImage"
+        android:layout_width="176dp"
+        android:layout_height="168dp"
+        app:layout_constraintBottom_toTopOf="@+id/sGuide"
+        app:srcCompat="@android:mipmap/sym_def_app_icon" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

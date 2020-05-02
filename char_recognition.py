@@ -32,7 +32,7 @@ def fit_to_grid(img, verbose=0):
 
     h, w = img.shape[:2]
     contours, hierarchy = cv2.findContours(
-        img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)  # cv2.RETR_LIST ensures we get children in contour hierarchy
+        img, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)  # cv2.RETR_LIST ensures we get children in contour hierarchy
 
     letter_contours = []
     img_to_draw = img.copy()
@@ -45,8 +45,8 @@ def fit_to_grid(img, verbose=0):
 
         # Don't plot small false positives that aren't text
         # In a cropped Boggle board, letters occupy between about 1/5 - 1/12 of a board dimension
-        # if w_c < (w/12) or h_c < (h/12) or w_c > (w/5) or h_c > (h/5):
-        #     continue
+        if w_c < (w/14) or h_c < (h/14) or w_c > (w/5) or h_c > (h/5):
+            continue
 
         # draw rectangle around contour on original image for visualization
         cv2.rectangle(img_to_draw, (x, y),

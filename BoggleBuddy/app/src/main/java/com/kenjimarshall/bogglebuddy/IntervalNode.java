@@ -1,5 +1,7 @@
 package com.kenjimarshall.bogglebuddy;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -68,13 +70,74 @@ public class IntervalNode<T> implements Comparable<IntervalNode> {
         }
     }
 
+    public void remove(IntervalNode<T> node) { // cheap removal. sets data to null.
+        if (node.data == null ) {
+            return;
+        }
+
+        if (this.data != null) {
+            if (this.equals(node)) { // same data
+                this.data = null;
+            }
+        }
+
+        else if (node.start <= this.start) {
+            if (this.lChild == null) {
+                return;
+            }
+            this.lChild.remove(node);
+        }
+        else {
+            if (this.rChild == null) {
+                return;
+            }
+            this.rChild.remove(node);
+        }
+    }
+
+    public void removeByData(T datum) { // preorder traversal
+
+
+        if (datum == null) {
+            return;
+        }
+
+        Stack<IntervalNode> stack = new Stack<>();
+        IntervalNode<T> curr = this;
+
+        stack.push(curr);
+
+        while (!stack.empty()) {
+
+            curr = stack.pop();
+            if (curr.data != null) { // hasn't been removed
+                if (curr.data.equals(datum)) { // found it
+                    curr.data = null;
+                    break;
+                }
+            }
+
+            if (curr.lChild != null) {
+                stack.push(curr.lChild);
+            } else if (curr.rChild != null) {
+                stack.push(curr.rChild);
+            }
+        }
+
+
+    }
+
+
+    public boolean equals(IntervalNode<T> node) {
+        return this.data.equals(node.data);
+    }
 
     public ArrayList<IntervalNode<ArrayList<T>>> merge() {
         Stack<IntervalNode> stack = new Stack<>();
         ArrayList<IntervalNode<ArrayList<T>>> merged = new ArrayList<>();
 
         IntervalNode<T> curr = this;
-        while (curr != null || stack.empty() == false) {
+        while (curr != null || !stack.empty()) {
             while (curr != null) {
                 stack.push(curr);
                 curr = curr.lChild;
@@ -83,22 +146,26 @@ public class IntervalNode<T> implements Comparable<IntervalNode> {
             // Gone all the way down L subtree so curr is null
             curr = stack.pop();
 
-            if (merged.size() == 0) { // Create new element
-                ArrayList<T> newData = new ArrayList<>();
-                newData.add(curr.data);
-                IntervalNode<ArrayList<T>> newInterval = new IntervalNode<>(curr.start, curr.end, newData);
-                merged.add(newInterval);
-            } else {
-                IntervalNode<ArrayList<T>> lastEl = merged.get(merged.size() - 1);
-                if (lastEl.overlaps(curr)) { // Expand last element
-                    lastEl.data.add(curr.data);
-                    lastEl.start = Math.min(lastEl.start, curr.start);
-                    lastEl.end = Math.min(lastEl.end, curr.end);
-                } else { // Create new element
+            if (curr.data != null) {
+                // has not been removed, so add to merged list
+
+                if (merged.size() == 0) { // Create new element
                     ArrayList<T> newData = new ArrayList<>();
                     newData.add(curr.data);
                     IntervalNode<ArrayList<T>> newInterval = new IntervalNode<>(curr.start, curr.end, newData);
                     merged.add(newInterval);
+                } else {
+                    IntervalNode<ArrayList<T>> lastEl = merged.get(merged.size() - 1);
+                    if (lastEl.overlaps(curr)) { // Expand last element
+                        lastEl.data.add(curr.data);
+                        lastEl.start = Math.min(lastEl.start, curr.start);
+                        lastEl.end = Math.max(lastEl.end, curr.end);
+                    } else { // Create new element
+                        ArrayList<T> newData = new ArrayList<>();
+                        newData.add(curr.data);
+                        IntervalNode<ArrayList<T>> newInterval = new IntervalNode<>(curr.start, curr.end, newData);
+                        merged.add(newInterval);
+                    }
                 }
             }
 
