@@ -72,7 +72,7 @@ public class IntervalNode<T> implements Comparable<IntervalNode> {
         }
     }
 
-    public void remove(IntervalNode<T> node) { // cheap removal. sets data to null.
+    public void remove(IntervalNode<T> node) { // lazy removal. sets data to null.
         if (node.data == null ) {
             return;
         }
@@ -101,6 +101,7 @@ public class IntervalNode<T> implements Comparable<IntervalNode> {
 
 
         if (datum == null) {
+            Log.d("Open CV", "NULL data to remove");
             return;
         }
 
@@ -116,16 +117,19 @@ public class IntervalNode<T> implements Comparable<IntervalNode> {
                 if (curr.data.equals(datum)) { // found it
                     Log.d("Open CV", "Found node to remove. Nullifying...");
                     curr.data = null;
-                    break;
+                    return;
                 }
             }
 
             if (curr.lChild != null) {
                 stack.push(curr.lChild);
-            } else if (curr.rChild != null) {
+            }
+            if (curr.rChild != null) {
                 stack.push(curr.rChild);
             }
         }
+
+        Log.d("Open CV", "Data couldn't be found for removal...");
 
 
     }

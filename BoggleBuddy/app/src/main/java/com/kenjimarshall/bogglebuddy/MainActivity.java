@@ -374,8 +374,6 @@ public class MainActivity extends AppCompatActivity {
         Imgproc.cvtColor(img, img, Imgproc.COLOR_BGR2GRAY);
         Imgproc.threshold(img, img, 150, 255, Imgproc.THRESH_BINARY_INV);
         Mat kernelOne = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3, 3));
-        Mat kernelTwo = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(5, 5));
-
 
         Imgproc.morphologyEx(img, img, Imgproc.MORPH_CLOSE, kernelOne, new Point(-1, -1), 2);
 
@@ -656,6 +654,17 @@ public class MainActivity extends AppCompatActivity {
                     continue;
                 }
 
+                double rotConfFactor;
+                double confFactor;
+                if (letterContour.width() < letterContour.height()) {
+                    rotConfFactor = 1;
+                    confFactor = 1.05;
+                }
+                else {
+                    rotConfFactor = 1.05;
+                    confFactor = 1;
+                }
+
                 Mat borderedLetterContour = new Mat();
                 Core.copyMakeBorder(letterContour, borderedLetterContour, 200, 200, 200, 200, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
                 Mat borderedLetterContourFlipped = borderedLetterContour.clone();
@@ -755,6 +764,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
+                Log.d("Tesseract", "Prediction: " + predictedChar + " with confidence " + String.valueOf(confidence));
+                Log.d("Tesseract", "Flipped Prediction: " + predictedCharFlipped + " with confidence " + String.valueOf(confidenceFlipped));
+                Log.d("Tesseract", "Prediction (CW): " + predictedCharCW + " with confidence " + String.valueOf(confidenceCW));
+                Log.d("Tesseract", "Prediction (CCW): " + predictedCharCCW + " with confidence " + String.valueOf(confidenceCCW));
+
+                finalPredConfidence = (int) Math.round(finalPredConfidence * confFactor);
+                finalPredRotConfidence = (int) Math.round(finalPredRotConfidence * rotConfFactor);
+
+                Log.d("Tesseract" ,"After rotation factor, confidence of: " + String.valueOf(finalPredConfidence) + " for " + finalPred);
+                Log.d("Tesseract" , "After rotation factor, confidence of: " + String.valueOf(finalPredRotConfidence) + " for " + finalPredRot);
+
+
                 if (finalPred.equals("I")) { // I is detected geometrically instead. Confusion between R and I should be mitigated.
                     Log.d("Tesseract", "Predicted I is invalid. Using rotated prediction.");
                     finalPred = finalPredRot;
@@ -763,11 +784,9 @@ public class MainActivity extends AppCompatActivity {
                     finalPred = finalPredRot;
                 }
 
-                Log.d("Tesseract", "Prediction: " + predictedChar + " with confidence " + String.valueOf(confidence));
-                Log.d("Tesseract", "Flipped Prediction: " + predictedCharFlipped + " with confidence " + String.valueOf(confidenceFlipped));
-                Log.d("Tesseract", "Prediction (CW): " + predictedCharCW + " with confidence " + String.valueOf(confidenceCW));
-                Log.d("Tesseract", "Prediction (CCW): " + predictedCharCCW + " with confidence " + String.valueOf(confidenceCCW));
                 Log.d("Tesseract", "Final Prediction: " + finalPred);
+
+
                 symbols.add(finalPred);
             }
         }
