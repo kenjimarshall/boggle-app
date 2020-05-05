@@ -23,7 +23,7 @@ Given an image cropped aroud the edges of the Boggle board, Open CV is used for 
 
  ## Usage Example
 
-![Demo](https://media.giphy.com/media/YOMw05p5s7wPE5DIfd/giphy.gif)
+![Demo](graphics/ocr.gif)
 
 
 
