@@ -23,10 +23,12 @@ Given an image cropped aroud the edges of the Boggle board, Open CV is used for 
 
  ## Usage Example
 
- ![](graphics/ocr_video.mp4)
+<video width="320" height="240" controls>
+  <source src="graphics/ocr_video.mp4" type="video/mp4">
+</video>)
 
 
- 
+
 
 
 
