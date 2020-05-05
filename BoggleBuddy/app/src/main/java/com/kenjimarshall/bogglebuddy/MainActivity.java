@@ -1121,8 +1121,9 @@ public class MainActivity extends AppCompatActivity {
     private Mat preprocessImage(Mat img) {
         Imgproc.cvtColor(img, img, Imgproc.COLOR_BGR2GRAY);
         Imgproc.threshold(img, img, 180, 255, Imgproc.THRESH_BINARY_INV);
-//        Mat kernelOne = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3, 3));
-//        Imgproc.morphologyEx(img, img, Imgproc.MORPH_CLOSE, kernelOne, new Point(-1, -1), 2);
+        Mat kernelOne = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3, 3));
+//        Imgproc.erode(img, img, kernelOne, new Point(-1, -1), 1);
+        Imgproc.morphologyEx(img, img, Imgproc.MORPH_CLOSE, kernelOne, new Point(-1, -1), 2);
 
         return img;
     }
@@ -1436,7 +1437,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Tesseract", "Tesseract API loaded.");
             for (Mat letterContour : letterContours) {
 
-                if (letterContour.width() < letterContour.height() * 1/3 || letterContour.height() < letterContour.width() * 1/3) {
+                if (letterContour.width() < letterContour.height() * 1/2.5 || letterContour.height() < letterContour.width() * 1/2.5) {
                     // has trouble with I so pinpoint geometrically
                     Log.d("Tesseract", "Identified I geometrically!");
                     symbols.add("I");
