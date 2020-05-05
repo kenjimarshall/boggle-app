@@ -17,5 +17,10 @@
         android:icon="@drawable/ic_info_outline_black_24dp"
         app:showAsAction="collapseActionView|ifRoom" />
 
+    <item android:id="@+id/faq"
+        android:title="FAQ">
+    </item>
+
+
 
 </menu>

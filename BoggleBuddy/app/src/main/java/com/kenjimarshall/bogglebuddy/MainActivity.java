@@ -44,6 +44,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.EditText;
 
@@ -260,31 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                EditText[] tiles = getTiles();
-                ColorStateList colorStateList = ColorStateList.valueOf(getColor(R.color.colorPrimaryDark));
-
-                ViewCompat.setBackgroundTintList(easyEntry, colorStateList);
-                easyEntry.setText("");
-
-                for (EditText tile: tiles) {
-                    ViewCompat.setBackgroundTintList(tile, colorStateList);
-                    tile.setText("");
-                }
-
-                ArrayList<SpannableString> solutions = new ArrayList<>(Arrays.asList(
-                        new SpannableString(""),
-                        new SpannableString(""),
-                        new SpannableString(""),
-                        new SpannableString(""),
-                        new SpannableString(""),
-                        new SpannableString(""),
-                        new SpannableString(""),
-                        new SpannableString(""),
-                        new SpannableString("")));
-                updateSolutions(solutions);
-
-                resetScore();
-
+                clearBoard();
             }
         });
 
@@ -384,6 +361,34 @@ public class MainActivity extends AppCompatActivity {
 
     //region Private Helper Methods
 
+    private void clearBoard() {
+
+        EditText[] tiles = getTiles();
+        ColorStateList colorStateList = ColorStateList.valueOf(getColor(R.color.colorPrimaryDark));
+
+        ViewCompat.setBackgroundTintList(easyEntry, colorStateList);
+        easyEntry.setText("");
+
+        for (EditText tile: tiles) {
+            ViewCompat.setBackgroundTintList(tile, colorStateList);
+            tile.setText("");
+        }
+
+        ArrayList<SpannableString> solutions = new ArrayList<>(Arrays.asList(
+                new SpannableString(""),
+                new SpannableString(""),
+                new SpannableString(""),
+                new SpannableString(""),
+                new SpannableString(""),
+                new SpannableString(""),
+                new SpannableString(""),
+                new SpannableString(""),
+                new SpannableString("")));
+        updateSolutions(solutions);
+
+        resetScore();
+
+    }
 
     /**
      * Get IDs of all of the Boggle tiles.
@@ -878,8 +883,8 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.help: {
                 // HTML formatting
-                String message = getString(R.string.populate_help) + "<br><br>" + getString(R.string.search_help)
-                        + "<br><br>"  + getString(R.string.camera_help) + "<br><br>"  + getString(R.string.solve_help);
+                String message = "<br>" + getString(R.string.populate_help) + "<br><br>" + getString(R.string.search_help)
+                        + "<br><br>"  + getString(R.string.camera_help) + "<br><br>"  + getString(R.string.solve_help) + "<br>";
                 Spanned messageStyled = HtmlCompat.fromHtml(message, HtmlCompat.FROM_HTML_MODE_LEGACY);
 
                 generateDialog(getString(R.string.help_dialog_title), messageStyled);
@@ -895,6 +900,27 @@ public class MainActivity extends AppCompatActivity {
                         "\n\n" + getString(R.string.email));
 
                 return true;
+            }
+
+            case R.id.faq: {
+
+                ImageView image = new ImageView(this);
+                image.setImageResource(R.drawable.ic_mw_logo);
+                String faqMessage = getString(R.string.q1) + "<br>" + getString(R.string.a1) + "<br><br>" +
+                        getString(R.string.q2) + "<br>" + getString(R.string.a2) + "<br><br>" +
+                        getString(R.string.q3) + "<br>" + getString(R.string.a3) + "<br><br>" +
+                        getString(R.string.q4) + "<br>" + getString(R.string.a4);
+                Spanned faqMessageStyled = HtmlCompat.fromHtml(faqMessage, HtmlCompat.FROM_HTML_MODE_LEGACY);
+
+
+
+                AlertDialog.Builder builder =
+                        new AlertDialog.Builder(this).
+                                setTitle(R.string.faq_dialog_title).
+                                setMessage(faqMessageStyled).
+                                setPositiveButton("OK", null).
+                                setView(image);
+                builder.create().show();
             }
 
             default:
@@ -1015,6 +1041,7 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<Mat> letterContours = fitToGrid(processedImg);
                     Toast.makeText(this, "Board found! Estimating characters...", Toast.LENGTH_SHORT).show();
                     prepareTesseract();
+                    clearBoard();
                     ArrayList<String> symbols = getBoardCharacters(letterContours);
                     Log.d("Tesseract", "CHARACTERS: " + symbols.toString());
                 } catch (BoardRecognitionError boardRecognitionError) {
