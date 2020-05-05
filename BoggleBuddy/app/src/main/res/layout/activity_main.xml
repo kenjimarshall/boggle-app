@@ -156,7 +156,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Button"
-
         android:text="Solve"
         app:layout_constraintEnd_toEndOf="@id/tileGrid"
         app:layout_constraintTop_toBottomOf="@id/tileGrid"
@@ -247,6 +246,13 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="18dp"
         android:layout_marginEnd="10dp" />
+
+<!--    <ImageView-->
+<!--        android:id="@+id/testImage"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:srcCompat="@android:mipmap/sym_def_app_icon"-->
+<!--        tools:layout_editor_absoluteY="503dp" />-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

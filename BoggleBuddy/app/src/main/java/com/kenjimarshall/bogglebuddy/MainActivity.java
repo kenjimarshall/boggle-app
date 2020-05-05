@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText easyEntry;
     private ListView solutionsListView;
     private TextView maxScore;
+//    private ImageView testImage;
 
     // Working with camera capture
     private Uri mPhotoUri, mCroppedUri;
@@ -181,6 +182,9 @@ public class MainActivity extends AppCompatActivity {
         maxScore = findViewById(R.id.maxScore);
         easyEntry = findViewById(R.id.easyEntry);
         cameraBtn = findViewById(R.id.camera);
+
+//        testImage = findViewById(R.id.testImage);
+
         solutionsListView = findViewById(R.id.solutionsListView);
 
 
@@ -273,6 +277,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                clearFields();
+
                 EditText[] tiles = getTiles();
                 Random r = new Random();
 
@@ -361,7 +367,8 @@ public class MainActivity extends AppCompatActivity {
 
     //region Private Helper Methods
 
-    private void clearBoard() {
+
+    private void clearFields() {
 
         EditText[] tiles = getTiles();
         ColorStateList colorStateList = ColorStateList.valueOf(getColor(R.color.colorPrimaryDark));
@@ -373,6 +380,10 @@ public class MainActivity extends AppCompatActivity {
             ViewCompat.setBackgroundTintList(tile, colorStateList);
             tile.setText("");
         }
+
+    }
+
+    private void clearSol(){
 
         ArrayList<SpannableString> solutions = new ArrayList<>(Arrays.asList(
                 new SpannableString(""),
@@ -387,6 +398,13 @@ public class MainActivity extends AppCompatActivity {
         updateSolutions(solutions);
 
         resetScore();
+
+    }
+
+    private void clearBoard() {
+
+        clearFields();
+        clearSol();
 
     }
 
@@ -1102,10 +1120,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private Mat preprocessImage(Mat img) {
         Imgproc.cvtColor(img, img, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.threshold(img, img, 150, 255, Imgproc.THRESH_BINARY_INV);
-        Mat kernelOne = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3, 3));
-
-        Imgproc.morphologyEx(img, img, Imgproc.MORPH_CLOSE, kernelOne, new Point(-1, -1), 2);
+        Imgproc.threshold(img, img, 180, 255, Imgproc.THRESH_BINARY_INV);
+//        Mat kernelOne = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3, 3));
+//        Imgproc.morphologyEx(img, img, Imgproc.MORPH_CLOSE, kernelOne, new Point(-1, -1), 2);
 
         return img;
     }
@@ -1150,7 +1167,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-            if (contourRect.area() < (imgHeight * imgWidth) * 1/450) { // small enough to capture I contours
+            if (contourRect.area() < (imgHeight * imgWidth) * 1/550) { // small enough to capture I contours
                 continue;
             }
 
@@ -1207,6 +1224,9 @@ public class MainActivity extends AppCompatActivity {
 
         Bitmap contourBitmap = Bitmap.createBitmap(img.cols(), img.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(img, contourBitmap);
+
+//        testImage.setImageBitmap(contourBitmap);
+
 
         Log.d("Open CV", letterContours.size() + " letter-sized contours found.");
 
@@ -1490,6 +1510,8 @@ public class MainActivity extends AppCompatActivity {
                 // best prediction for upright orientations
                 String finalPred;
                 int finalPredConfidence;
+
+                Log.d("Tesseract", predictedChar + "|" + predictedCharFlipped + "|" + predictedCharCW + "|" +  predictedCharCCW);
 
                 if (predictedChar.equals(" ") && predictedCharFlipped.equals(" ")) {
                     finalPred = ""; // Empty prediction
