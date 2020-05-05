@@ -18,8 +18,16 @@ public class Boggle {
     private HashSet<String> wordDict;
     private HashSet<String> threeDict;
     private int size;
+    private int score;
     private ArrayList<Node> adjList;
     private Context mContext;
+
+    public Boggle(Context mContext) {
+        this.mContext = mContext;
+        ArrayList<HashSet<String>> dicts = loadWordDict();
+        this.wordDict = dicts.get(0);
+        this.threeDict = dicts.get(1);
+    }
 
     public Boggle(ArrayList<String> symbols, Context mContext) {
         this.size = 4;
@@ -28,6 +36,7 @@ public class Boggle {
         ArrayList<HashSet<String>> dicts = loadWordDict();
         this.wordDict = dicts.get(0);
         this.threeDict = dicts.get(1);
+        this.score = 0;
     }
 
 
@@ -47,9 +56,7 @@ public class Boggle {
 
             reader.close();
 
-        }
-        catch (FileNotFoundException ignored) {}
-        catch (IOException ignored) {}
+        } catch (IOException ignored) {}
 
         ArrayList<HashSet<String>> dicts = new ArrayList<>();
         dicts.add(wordDict);
@@ -85,6 +92,7 @@ public class Boggle {
 
     public HashMap<Integer, String[]> findWords() {
         HashMap<Integer, HashSet<String>> validWords = new HashMap<>(); // maps length of word to array of words
+        this.score = 0; // count from zero
         for (int i = 3; i <= 10; i++) {
             validWords.put(Integer.valueOf(i), new HashSet<String>()); // words of length 3 to 10
         }
@@ -96,11 +104,16 @@ public class Boggle {
         }
 
         HashMap<Integer, String[]> sortedValidWords = new HashMap<>();
+
+        int scoreMultiplier = 1;
         for (Integer key: validWords.keySet()){
-            String[] words = new String[validWords.get(key).size()];
+            int numWords = validWords.get(key).size();
+            this.score += scoreMultiplier * numWords;
+            String[] words = new String[numWords];
             validWords.get(key).toArray(words);
             Arrays.sort(words);
             sortedValidWords.put(key, words);
+            scoreMultiplier++;
         }
 
         return sortedValidWords;
@@ -130,6 +143,10 @@ public class Boggle {
                 }
             }
         }
+    }
+
+    public int getScore() {
+        return score;
     }
 
 

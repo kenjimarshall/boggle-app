@@ -1,17 +1,24 @@
 <resources>
     <string name="app_name">Boggle Buddy</string>
-    
-    <string-array name="word_sizes">
-        <item>3 Letters</item>
-        <item>4 Letters</item>
-        <item>5 Letters</item>
-        <item>6 Letters</item>
-        <item>7 Letters</item>
-        <item>8 Letters</item>
-        <item>9 Letters</item>
-        <item>10 Letters</item>
-    </string-array>
-    
+
+    <string name = "search_title">Word Validator</string>
+    <string name = "help_title">"Help</string>
+    <string name = "about_title">About</string>
+    <string name = "search_hint">Search a word</string>
+
+    <string name = "about_dialog_title">About</string>
+    <string name = "version">Boggle Buddy Version 1.0</string>
+    <string name = "author_credit">A project by Kenji Marshall</string>
+    <string name = "email">kenji.marshall99@gmail.com</string>
+
+
+    <string name = "search_help">&lt;b>Search&lt;/b>: Enter any word and I\'ll validate it against the North American Scrabble Players Association 2018 word list.</string>
+    <string name = "populate_help">&lt;b>Populate&lt;/b>: Type the 16 characters as a single word from left to right and top to bottom. I\'ll automatically convert "q" to Qu.</string>
+    <string name = "camera_help">&lt;b>Camera&lt;/b>: Take a picture of your Boggle board and I\'ll do my best to recognize all the characters. To help me out, I only ask that you use our cropping tool to isolate the board.</string>
+    <string name = "solve_help">&lt;b>Solve&lt;/b>: I\'ll find all the possible words and display them below.</string>
+    <string name = "help_dialog_title">Instructions</string>
+
+
     <string-array name="solutions">
         <item>cat</item>
         <item>bone</item>
@@ -22,5 +29,5 @@
         <item>potpourri</item>
         <item>straighten</item>
     </string-array>
-    
 </resources>
+

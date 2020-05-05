@@ -6,21 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="176dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="176dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Boggle Buddy"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/wGuide"
@@ -40,11 +25,11 @@
         android:id="@+id/tileGrid"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toStartOf="@+id/eGuide"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/wGuide"
-        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintTop_toBottomOf="@+id/easyEntry"
 
         >
 
@@ -54,9 +39,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-<!--            <com.google.android.material.textfield.TextInputEditText-->
-<!--                android:id="@+id/tile_0_0"-->
-<!--                style="@style/BoggleTile" />-->
+            <!--            <com.google.android.material.textfield.TextInputEditText-->
+            <!--                android:id="@+id/tile_0_0"-->
+            <!--                style="@style/BoggleTile" />-->
 
             <EditText
                 android:id="@+id/tile_0_0"
@@ -156,30 +141,43 @@
 
     <ImageButton
         android:id="@+id/camera"
-        style="@style/Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/Button"
+
         app:layout_constraintStart_toStartOf="@id/tileGrid"
         app:layout_constraintTop_toBottomOf="@id/tileGrid"
-        app:srcCompat="@android:drawable/ic_menu_camera" />
+        app:srcCompat="@android:drawable/ic_menu_camera"
+        android:backgroundTint="@color/colorPrimary"
+    />
 
     <Button
         android:id="@+id/solveButton"
-        style="@style/Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Solve"
+        style="@style/Button"
 
+        android:text="Solve"
         app:layout_constraintEnd_toEndOf="@id/tileGrid"
-        app:layout_constraintTop_toBottomOf="@id/tileGrid" />
+        app:layout_constraintTop_toBottomOf="@id/tileGrid"
+        android:backgroundTint="@color/positiveColor"/>
 
     <Button
         android:id="@+id/randomButton"
-        style="@style/Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Random Board"
+        style="@style/Button"
+        android:text="Random"
         app:layout_constraintEnd_toStartOf="@id/solveButton"
+        app:layout_constraintTop_toBottomOf="@id/tileGrid" />
+
+    <Button
+        android:id="@+id/clearBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Button"
+        android:text="Clear"
+        app:layout_constraintEnd_toStartOf="@id/randomButton"
         app:layout_constraintTop_toBottomOf="@id/tileGrid" />
 
     <TextView
@@ -189,10 +187,24 @@
         app:layout_constraintTop_toBottomOf="@id/camera"
         android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="@id/wGuide"
-        app:layout_constraintEnd_toStartOf="@id/eGuide"
         android:text="Solution"
+        android:layout_marginStart="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/maxScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Max Score:"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toStartOf="@id/eGuide"
+        app:layout_constraintTop_toBottomOf="@id/camera">
 
     </TextView>
 
@@ -208,12 +220,33 @@
         app:layout_constraintStart_toStartOf="@id/wGuide"
         app:layout_constraintTop_toBottomOf="@id/solutionsTextView" />
 
-    <ImageView
-        android:id="@+id/testImage"
-        android:layout_width="176dp"
-        android:layout_height="168dp"
-        app:layout_constraintBottom_toTopOf="@+id/sGuide"
-        app:srcCompat="@android:mipmap/sym_def_app_icon" />
+
+    <EditText
+        android:id="@+id/easyEntry"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:textSize="18sp"
+        android:hint="Ex. abcdefghijklmnop"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toStartOf="@id/wGuide"
+        app:layout_constraintEnd_toStartOf="@id/eGuide"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="120dp"
+    />
+
+    <Button
+        android:id="@+id/populateBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Populate"
+        android:backgroundTint="@color/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@id/eGuide"
+        app:layout_constraintStart_toEndOf="@id/easyEntry"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="10dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
