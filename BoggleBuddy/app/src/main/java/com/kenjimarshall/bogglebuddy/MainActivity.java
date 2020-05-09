@@ -4,22 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 
 import android.app.AlertDialog;
 import android.app.SearchManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,7 +28,6 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -147,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
     private String ASSET_TESS_DIR = "tessdata"; // where tesseract training data is store in assets
     private String TESS_DATA = "/tessdata"; // folder in external storage to copy tesseract training data
     private String DATA_PATH; // path to external storage
+    private String EXTERNAL_DIR;
 
     private TessBaseAPI tessAPI; // OCR engine
     private Boggle validator; // Used to validate words
@@ -174,6 +169,8 @@ public class MainActivity extends AppCompatActivity {
         validator = new Boggle(this); // Empty graph. Used only for word validator feature
 
         DATA_PATH = this.getExternalFilesDir(null) + "/Tess"; // where we store tesseract training file
+        EXTERNAL_DIR = this.getExternalFilesDir(null).toString();
+        Log.d("Main", EXTERNAL_DIR);
 
         randomBtn = findViewById(R.id.randomButton);
         solveBtn = findViewById(R.id.solveButton);
@@ -331,11 +328,33 @@ public class MainActivity extends AppCompatActivity {
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkPermission(); // READ/WRITE_EXTERNAL_STORAGE
+//                checkPermission();
                 sendPhotoIntent();
             }
         });
     }
+
+
+    /**
+     * Check permissions to READ/WRITE to external storage
+     */
+//    private void checkPermission() {
+//        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            Log.d("Main", "Missing read");
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//                generateDialog("External Storage?", "The camera feature needs access to your external storage so it can find the photo after it's taken and store some data for the character recognition tool. Don't hesitate to reach out if you have any more questions.");
+//            }
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 120);
+//
+//        }
+//        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            Log.d("Main", "Missing write");
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//                generateDialog("External Storage?", "The camera feature needs access to your external storage so it can find the photo after it's taken and store some data for the character recognition tool. Don't hesitate to reach out if you have any more questions.");
+//            }
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 121);
+//        }
+//    }
 
     //endregion
 
@@ -379,6 +398,21 @@ public class MainActivity extends AppCompatActivity {
         for (EditText tile: tiles) {
             ViewCompat.setBackgroundTintList(tile, colorStateList);
             tile.setText("");
+        }
+
+    }
+
+    public void deleteFiles(String path) {
+        File file = new File(path);
+
+        if (file.exists()) {
+            String deleteCmd = "rm -r " + path;
+            Runtime runtime = Runtime.getRuntime();
+            try {
+                runtime.exec(deleteCmd);
+            } catch (IOException e) {
+
+            }
         }
 
     }
@@ -562,25 +596,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void resetScore() {
         maxScore.setText("Max Score:");
-    }
-
-
-    /**
-     * Check permissions to READ/WRITE to external storage
-     */
-    private void checkPermission() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                generateDialog("External Storage?", "The camera feature needs access to your external storage so it can find the photo after it's taken and store some data for the character recognition tool. Don't hesitate to reach out if you have any more questions.");
-            }
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 120);
-        }
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                generateDialog("External Storage?", "The camera feature needs access to your external storage so it can find the photo after it's taken and store some data for the character recognition tool. Don't hesitate to reach out if you have any more questions.");
-            }
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 121);
-        }
     }
 
     /**
@@ -1014,6 +1029,7 @@ public class MainActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        Log.d("Camera", storageDir.toString());
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -1041,7 +1057,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // Capture cancelled
             } else {
-                Toast.makeText(getApplicationContext(), "Photograph failed. Ensure permissions to access external storage are on!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Photograph failed...", Toast.LENGTH_LONG).show();
             }
         }
         else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -1055,12 +1071,17 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Couldn't find photo file", Toast.LENGTH_SHORT).show();
                 }
                 Mat processedImg = preprocessImage(img);
+                deleteFiles(EXTERNAL_DIR); // delete the photo files
+
                 try {
                     ArrayList<Mat> letterContours = fitToGrid(processedImg);
                     Toast.makeText(this, "Board found! Estimating characters...", Toast.LENGTH_SHORT).show();
                     prepareTesseract();
+
                     clearBoard();
                     ArrayList<String> symbols = getBoardCharacters(letterContours);
+                    deleteFiles(EXTERNAL_DIR); // delete the tess files
+
                     Log.d("Tesseract", "CHARACTERS: " + symbols.toString());
                 } catch (BoardRecognitionError boardRecognitionError) {
                     Toast.makeText(this, "Couldn't find grid... :( Try again or enter manually.", Toast.LENGTH_LONG).show();
@@ -1068,7 +1089,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Toast.makeText(getApplicationContext(), "Crop failed. Ensure permissions to access external storage are on!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Crop failed...", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -1355,7 +1376,7 @@ public class MainActivity extends AppCompatActivity {
         File dir = new File(path);
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
-                Log.d("Tesseract", "ERROR: Creation of directory " + path + " failed, check does Android Manifest have permission to write to external storage.");
+                Log.d("Tesseract", "ERROR: Creation of directory " + path + " failed.");
             }
         } else {
             Log.d("Tesseract", "Created directory " + path);
@@ -1409,7 +1430,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         } catch (IOException e) {
-            Log.e("Tesseract", "Unable to copy files to tessdata " + e.toString());
+            Log.d("Tesseract", "Unable to copy files to tessdata " + e.toString());
         }
     }
 

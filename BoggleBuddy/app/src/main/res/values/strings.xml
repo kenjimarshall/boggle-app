@@ -7,23 +7,22 @@
     <string name = "search_hint">Search a word</string>
 
     <string name = "about_dialog_title">About</string>
-    <string name = "version">Boggle Buddy Version 1.0</string>
+    <string name = "version">Boggle Buddy Version 1.0.1</string>
     <string name = "author_credit">A project by Kenji Marshall</string>
     <string name = "email">kenji.marshall99@gmail.com</string>
 
     <string name = "faq_dialog_title">Frequently Asked Questions</string>
-    <string name = "q1">&lt;b>How can I improve the character recognition?&lt;/b></string>
-    <string name = "a1">The character recognition tool isn\'t perfect, so it\'s normal for it to
-        miss some letters. Make sure you take your photos head on and try to minimize glare.</string>
+    <string name = "q1">&lt;br>&lt;b>How can I improve the character recognition?&lt;/b></string>
+    <string name = "a1">It\'s not perfect! Take your photos head on with consistent lighting.</string>
 
     <string name = "q2">&lt;b>What word list does Boggle Buddy use?&lt;/b></string>
-    <string name = "a2">It uses the North American Scrabble Players Association official 2018 word list.</string>
+    <string name = "a2">The North American Scrabble Players Association official 2018 word list.</string>
 
     <string name = "q3">&lt;b>I think I noticed a bug..&lt;/b></string>
-    <string name = "a3">Reach out to kenji.marshall99@gmail.com</string>
+    <string name = "a3">Reach out to:&lt;br>kenji.marshall99@gmail.com</string>
 
     <string name = "q4">&lt;b>What dictionary are the definitions coming from?&lt;/b></string>
-    <string name= "a4">Boggle Buddy uses Merriam-Webster\'s Collegiate Dictionary API.</string>
+    <string name= "a4">Boggle Buddy uses Merriam-Webster\'s Collegiate Dictionary API.&lt;br></string>
 
 
 
