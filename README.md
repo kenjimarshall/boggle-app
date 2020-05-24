@@ -1,6 +1,10 @@
 # Boggle Buddy for Android
 
-This is an app companion for the word game Boggle. If uses Open CV and the Tesseract OCR engine to recognize the tiles on a Boggle board. Given a grid of letters, it solves that Boggle board using DFS on the board graph. It's also linked to the Merriam-Webster API to give word definitions so you can learn as you play!
+See the [expanded writeup](http://kenjimarshall.com/projects/boggle_buddy.html) on my website.
+
+[Boggle Buddy on Google Play](https://play.google.com/store/apps/details?id=com.kenjimarshall.bogglebuddy) 
+
+This is an app companion for the word game Boggle. If uses Open CV and the Tesseract OCR engine to recognize the tiles on a Boggle board. Given a grid of letters, it solves that Boggle board via DFS on the board graph. It's also linked to the Merriam-Webster API to give word definitions so you can learn as you play!
 
 ## Dependencies
 
@@ -15,11 +19,11 @@ Doing a DFS from each node in the Boggle graph will generate all possible words.
 
 ## Character Recognition
 
-Given an image cropped aroud the edges of the Boggle board, Open CV is used for some image processing, and then isolates possible letter contours. Here's an example (the white boxes are drawn around the letter contours found by Open CV):
+Given an image cropped aroud the edges of the Boggle board, Open CV does some image processing and then isolates possible letter contours. Here's an example (the white boxes are drawn around the letter contours found by Open CV):
 
 ![](graphics/contour_example.png)
 
-These contours are organized in two binary search trees by their x-coordinate and their y-coordinate spans in order to attempt and fit the collection to a 4x4 grid. The fit is flexible so some letters can be missed and the 4x4 structure can still be found. Outlier contours (those which are the only contours in a row/column) are pruned to make the system more robust. The Tesseract OCR engine is then used to identify each character.
+These contours are organized in two binary search trees by their x-coordinate interval and their y-coordinate intervals. This structure let's us fit the collection of contours to a 4x4 grid. The fit is flexible so some letters can be missed and the 4x4 structure can still be found. Outlier contours (those which are the only contours in a row/column) are pruned to make the system more robust. The Tesseract OCR engine is then used to identify each character.
 
 ## Usage Example
 
