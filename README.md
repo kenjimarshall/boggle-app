@@ -2,8 +2,6 @@
 
 See the [expanded writeup](http://kenjimarshall.com/projects/boggle_buddy.html) on my website.
 
-[Boggle Buddy on Google Play](https://play.google.com/store/apps/details?id=com.kenjimarshall.bogglebuddy) 
-
 This is an app companion for the word game Boggle. If uses Open CV and the Tesseract OCR engine to recognize the tiles on a Boggle board. Given a grid of letters, it solves that Boggle board via DFS on the board graph. It's also linked to the Merriam-Webster API to give word definitions so you can learn as you play!
 
 ## Dependencies
